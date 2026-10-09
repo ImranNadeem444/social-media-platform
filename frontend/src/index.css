@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  @apply box-border;
+}
+
+body {
+  @apply bg-white text-gray-900;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input:focus,
+button:focus,
+select:focus,
+textarea:focus {
+  @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+}
+
+button {
+  @apply cursor-pointer transition-colors;
+}
+
+a {
+  @apply text-primary-600 hover:text-primary-700 underline;
+}
