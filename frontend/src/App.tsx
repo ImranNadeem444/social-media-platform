@@ -14,7 +14,7 @@ import FacebookOAuthError from './pages/FacebookOAuthError'
 
 function App() {
   return (
-    <Router>
+    <Router basename="/social-media-platform">
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
