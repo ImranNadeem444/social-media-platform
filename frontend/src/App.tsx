@@ -14,15 +14,29 @@ import FacebookOAuthError from './pages/FacebookOAuthError'
 
 function App() {
   return (
-    <Router basename="/social-media-platform">
+    <Router>
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/instagram/success" element={<InstagramOAuthSuccess />} />
-          <Route path="/instagram/error" element={<InstagramOAuthError />} />
-          <Route path="/facebook/success" element={<FacebookOAuthSuccess />} />
-          <Route path="/facebook/error" element={<FacebookOAuthError />} />
+
+          <Route
+            path="/instagram/success"
+            element={<InstagramOAuthSuccess />}
+          />
+          <Route
+            path="/instagram/error"
+            element={<InstagramOAuthError />}
+          />
+          <Route
+            path="/facebook/success"
+            element={<FacebookOAuthSuccess />}
+          />
+          <Route
+            path="/facebook/error"
+            element={<FacebookOAuthError />}
+          />
+
           <Route
             path="/dashboard"
             element={
@@ -31,6 +45,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/accounts"
             element={
@@ -39,6 +54,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/facebook/select-pages"
             element={
@@ -47,6 +63,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/create-post"
             element={
@@ -55,6 +72,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </AuthProvider>
