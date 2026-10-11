@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
@@ -20,10 +20,11 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
-# Configure CORS for development frontend access
+# Configure CORS for the deployed Vercel frontend and local development.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://social-media-platform-bice.vercel.app",
         "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:5175",
@@ -42,7 +43,7 @@ app.add_middleware(
 
 app.include_router(api_router, prefix="/api/v1")
 
-# Serve uploaded files
+# Serve uploaded files.
 public_dir = Path(__file__).parent.parent / "public"
 if public_dir.exists():
     app.mount("/public", StaticFiles(directory=public_dir), name="public")
@@ -53,16 +54,16 @@ async def add_security_headers(request, call_next):
     """Add security headers to all responses."""
     response = await call_next(request)
 
-    # Prevent MIME type sniffing
+    # Prevent MIME type sniffing.
     response.headers["X-Content-Type-Options"] = "nosniff"
 
-    # Prevent clickjacking
+    # Prevent clickjacking.
     response.headers["X-Frame-Options"] = "DENY"
 
-    # Referrer policy
+    # Referrer policy.
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
-    # XSS protection (legacy browsers)
+    # XSS protection for legacy browsers.
     response.headers["X-XSS-Protection"] = "1; mode=block"
 
     return response
