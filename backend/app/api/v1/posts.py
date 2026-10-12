@@ -1,3 +1,4 @@
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 from sqlalchemy.orm import Session
 from sqlalchemy import select
@@ -47,7 +48,7 @@ async def create_post(
         - target="facebook": publishes to ALL connected Facebook pages
         - target="all": publishes to ALL connected Instagram and Facebook accounts
 
-    Each target publishes independently. If one fails, others continue.
+    Each target publishes independently. If one target fails, others continue.
     """
 
     # Validate target parameter
@@ -109,33 +110,38 @@ async def create_post(
         db.refresh(post)
 
         # Refresh targets to get database-generated timestamps
-        for target in post_targets:
-            db.refresh(target)
+        for post_target in post_targets:
+            db.refresh(post_target)
 
         # Enrich targets with account names
         enriched_targets = []
-        for target in post_targets:
+        for post_target in post_targets:
             social_account = db.scalar(
                 select(SocialAccount).where(
-                    SocialAccount.id == target.social_account_id
+                    SocialAccount.id == post_target.social_account_id
                 )
             )
 
             enriched_targets.append({
-                "id": target.id,
-                "post_id": target.post_id,
-                "social_account_id": target.social_account_id,
-                "platform": target.platform,
-                "account_name": social_account.account_name if social_account else None,
-                "account_id": social_account.account_id if social_account else None,
-                "status": target.status,
-                "platform_media_id": target.platform_media_id,
-                "platform_post_id": target.platform_post_id,
-                "error_message": target.error_message,
-                "created_at": target.created_at,
-                "updated_at": target.updated_at,
+                "id": post_target.id,
+                "post_id": post_target.post_id,
+                "social_account_id": post_target.social_account_id,
+                "platform": post_target.platform,
+                "account_name": (
+                    social_account.account_name if social_account else None
+                ),
+                "account_id": (
+                    social_account.account_id if social_account else None
+                ),
+                "status": post_target.status,
+                "platform_media_id": post_target.platform_media_id,
+                "platform_post_id": post_target.platform_post_id,
+                "error_message": post_target.error_message,
+                "created_at": post_target.created_at,
+                "updated_at": post_target.updated_at,
             })
 
+        # FIX: Pass the platform string, not a PostTarget ORM object.
         log_post_created(
             current_user.id,
             target,
@@ -167,7 +173,12 @@ async def create_post(
             f"ValueError: {error_message}"
         )
 
-        log_post_failure(current_user.id, error_message, request, db)
+        log_post_failure(
+            current_user.id,
+            error_message,
+            request,
+            db,
+        )
 
         # Clean up uploaded file
         try:
@@ -199,7 +210,12 @@ async def create_post(
             f"{traceback.format_exc()}"
         )
 
-        log_post_failure(current_user.id, f"{error_type}: {error_str}", request, db)
+        log_post_failure(
+            current_user.id,
+            f"{error_type}: {error_str}",
+            request,
+            db,
+        )
 
         # Clean up uploaded file
         try:

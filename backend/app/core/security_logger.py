@@ -37,7 +37,7 @@ def _create_audit_log(
         user_id=user_id,
         action=action,
         status=status,
-        details=json.dumps(details) if details else None,
+        details=json.dumps(details, default=str) if details else None,
         error_message=error_message,
         ip_address=ip_address,
     )
